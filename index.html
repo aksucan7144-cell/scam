@@ -3,35 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scam With Your Friends - Call Center Simulator</title>
+    <title>Scam With Your Friends - Call Center Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=VT323&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
         body { background-color: #0b0f19; font-family: 'Inter', sans-serif; color: #fff; overflow: hidden; height: 100vh; }
 
-        /* Ana Menü Ekranı */
+        /* Ana Menü */
         #main-menu {
             position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: linear-gradient(135deg, #111827 0%, #1f2937 100%);
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             z-index: 1000; transition: opacity 0.5s ease;
         }
-        #main-menu h1 { font-family: 'VT323', monospace; font-size: 5rem; color: #10b981; text-shadow: 0 0 20px rgba(16,185,129,0.5); margin-bottom: 10px; }
-        #main-menu p { color: #9ca3af; font-size: 1.2rem; margin-bottom: 40px; }
+        #main-menu h1 { font-family: 'VT323', monospace; font-size: 5.5rem; color: #10b981; text-shadow: 0 0 25px rgba(16,185,129,0.4); margin-bottom: 5px; }
+        #main-menu p { color: #94a3b8; font-size: 1.3rem; margin-bottom: 40px; }
         .menu-btn {
-            background: #10b981; color: #0b0f19; border: none; padding: 15px 40px; font-size: 1.3rem;
-            font-weight: 700; border-radius: 8px; cursor: pointer; margin: 10px; transition: 0.2s; box-shadow: 0 4px 12px rgba(16,185,129,0.3);
+            background: #10b981; color: #0b0f19; border: none; padding: 16px 45px; font-size: 1.4rem;
+            font-weight: 700; border-radius: 8px; cursor: pointer; margin: 10px; transition: 0.2s; box-shadow: 0 4px 15px rgba(16,185,129,0.3);
         }
         .menu-btn:hover { background: #059669; transform: translateY(-2px); }
-        .menu-btn.secondary { background: #374151; color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
-        .menu-btn.secondary:hover { background: #4b5563; }
-        .lang-select { position: absolute; top: 20px; right: 20px; background: #1f2937; color: #fff; border: 1px: solid #374151; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 1rem; }
+        .menu-btn.secondary { background: #334155; color: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .menu-btn.secondary:hover { background: #475569; }
+        .lang-select { position: absolute; top: 20px; right: 20px; background: #1e293b; color: #fff; border: 1px solid #475569; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 1rem; outline: none; }
 
-        /* Oyun Alanı / PC Arayüzü */
-        #game-container { display: none; width: 100vw; height: 100vh; position: relative; background: #0f172a; }
+        /* Oyun Alanı */
+        #game-container { display: none; width: 100vw; height: 100vh; position: relative; background: #090d16; }
         
-        /* Sol Üst Liste (Scam Rehberi & Hedefler) */
+        /* Pencereler */
         .window-box {
             position: absolute; background: #1e293b; border: 1px solid #334155; border-radius: 8px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.5); overflow: hidden; display: flex; flex-direction: column;
@@ -42,64 +42,68 @@
         }
         .window-content { padding: 12px; overflow-y: auto; flex: 1; font-size: 0.9rem; color: #cbd5e1; }
         
-        #guide-window { top: 20px; left: 20px; width: 320px; height: 260px; }
-        
-        /* Sağ Üst Facecam */
+        #guide-window { top: 20px; left: 20px; width: 320px; height: 250px; }
         #facecam-window { top: 20px; right: 20px; width: 220px; height: 160px; }
+        
         .facecam-view { width: 100%; height: calc(100% - 31px); background: #000; position: relative; display: flex; align-items: center; justify-content: center; }
         .avatar-anim { font-size: 3rem; animation: talkPulse 1.5s infinite alternate; }
         @keyframes talkPulse { 0% { transform: scale(1); } 100% { transform: scale(1.08); } }
         .status-badge { position: absolute; bottom: 8px; left: 8px; background: rgba(0,0,0,0.7); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; color: #10b981; }
 
         /* Sol Alt Uygulamalar */
-        #apps-window { bottom: 20px; left: 20px; width: 360px; height: 280px; }
+        #apps-window { bottom: 20px; left: 20px; width: 360px; height: 270px; }
         .app-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 5px; }
         .app-icon {
-            background: #334155; border: none; border-radius: 8px; padding: 15px 10px; color: #fff;
-            display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; transition: 0.2s; font-size: 0.8rem;
+            background: #334155; border: none; border-radius: 8px; padding: 14px 10px; color: #fff;
+            display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; transition: 0.2s; font-size: 0.75rem;
         }
         .app-icon:hover { background: #475569; transform: scale(1.05); }
-        .app-icon i { font-size: 1.5rem; color: #38bdf8; }
+        .app-icon i { font-size: 1.4rem; color: #38bdf8; }
 
         /* Orta Telefon / Görüşme Paneli */
         #phone-panel {
-            position: absolute; top: 200px; left: 360px; right: 260px; bottom: 20px;
+            position: absolute; top: 190px; left: 360px; right: 260px; bottom: 20px;
             background: #1e293b; border: 1px solid #334155; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden;
         }
-        .call-header { background: #0f172a; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
-        .call-stats { display: flex; gap: 20px; font-size: 0.85rem; }
+        .call-header { background: #0f172a; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
+        .call-stats { display: flex; gap: 15px; font-size: 0.85rem; }
         .stat-bar { background: #334155; padding: 4px 10px; border-radius: 4px; display: flex; gap: 6px; align-items: center; }
         
-        .chat-stream { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; font-family: 'VT323', monospace; font-size: 1.4rem; }
+        .chat-stream { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; font-family: 'VT323', monospace; font-size: 1.35rem; }
         .chat-msg { padding: 10px 15px; border-radius: 8px; max-width: 75%; line-height: 1.2; word-break: break-all; }
         .chat-msg.customer { background: #334155; color: #f8fafc; align-self: flex-start; }
         .chat-msg.player { background: #047857; color: #ecfdf5; align-self: flex-end; cursor: pointer; }
         .chat-msg.player:hover { outline: 2px dashed #34d399; }
 
-        /* Konuşma / Mikrofon Kontrol Paneli */
         .call-controls { background: #0f172a; padding: 15px; display: flex; gap: 15px; align-items: center; border-top: 1px solid #334155; }
         .mic-btn {
-            background: #ef4444; color: #fff; border: none; width: 55px; height: 55px; border-radius: 50%;
-            font-size: 1.3rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(239,68,68,0.4); transition: 0.2s;
+            background: #ef4444; color: #fff; border: none; width: 50px; height: 50px; border-radius: 50%;
+            font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 12px rgba(239,68,68,0.4); transition: 0.2s;
         }
         .mic-btn.active { background: #10b981; box-shadow: 0 0 20px rgba(16,185,129,0.7); animation: pulseMic 1.2s infinite; }
         @keyframes pulseMic { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
         
-        .transcript-input-box { flex: 1; background: #1e293b; border: 1px solid #475569; border-radius: 8px; padding: 10px 15px; font-size: 0.95rem; color: #fff; outline: none; }
-        
-        .hangup-btn { background: #dc2626; color: #fff; border: none; padding: 10px 20px; font-weight: 700; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+        .transcript-input-box { flex: 1; background: #1e293b; border: 1px solid #475569; border-radius: 8px; padding: 10px 15px; font-size: 0.9rem; color: #fff; outline: none; }
+        .hangup-btn { background: #dc2626; color: #fff; border: none; padding: 10px 18px; font-weight: 700; border-radius: 8px; cursor: pointer; transition: 0.2s; }
         .hangup-btn:hover { background: #b91c1c; }
 
-        /* Modal Pencereler (Tech Support / Kredi Kartı Uygulamaları) */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 2000; }
-        .modal-window { background: #1e293b; border: 1px solid #475569; border-radius: 10px; width: 400px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+        /* Modaller (Uygulama Pencereleri) */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.65); display: none; align-items: center; justify-content: center; z-index: 2000; }
+        .modal-window { background: #1e293b; border: 1px solid #475569; border-radius: 10px; width: 420px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
         .modal-head { background: #0f172a; padding: 12px 15px; font-weight: 600; display: flex; justify-content: space-between; border-bottom: 1px solid #334155; }
         .modal-body { padding: 20px; display: flex; flex-direction: column; gap: 15px; }
         .modal-body input { background: #0f172a; border: 1px solid #334155; padding: 10px; color: #fff; border-radius: 6px; outline: none; }
-        .modal-body button { background: #10b981; border: none; padding: 10px; font-weight: 700; border-radius: 6px; cursor: pointer; color: #0b0f19; }
+        .modal-body button { background: #10b981; border: none; padding: 10px; font-weight: 700; border-radius: 6px; cursor: pointer; color: #0b0f19; transition: 0.2s; }
+        .modal-body button:hover { background: #059669; }
 
-        /* Sürüklenebilir Pencereler İçin Basit Not */
-        .dragging { opacity: 0.8; }
+        /* Sağ Panel: Kota ve Skor */
+        #stats-window {
+            position: absolute; top: 190px; right: 20px; width: 220px; bottom: 20px;
+            background: #1e293b; border: 1px solid #334155; border-radius: 8px; display: flex; flex-direction: column; padding: 15px; gap: 15px;
+        }
+        .quota-box { background: #0f172a; padding: 12px; border-radius: 6px; border: 1px solid #334155; }
+        .quota-title { font-size: 0.8rem; color: #94a3b8; margin-bottom: 5px; }
+        .quota-amount { font-family: 'VT323'; font-size: 1.8rem; color: #34d399; }
     </style>
 </head>
 <body>
@@ -113,31 +117,46 @@
     <!-- ANA MENÜ -->
     <div id="main-menu">
         <h1 id="ui-title">SCAM WITH YOUR FRIENDS</h1>
-        <p id="ui-subtitle">Call Center Edition - India Scammer Simulator</p>
-        <button class="menu-btn" onclick="startGame('offline')"><i class="fa-solid fa-user"></i> <span id="btn-offline">Offline (1 Player)</span></button>
-        <button class="menu-btn secondary" onclick="alert('Multiplayer modu yakında eklenecek, kanka!')"><i class="fa-solid fa-users"></i> <span id="btn-multi">Multiplayer (Coming Soon)</span></button>
+        <p id="ui-subtitle">Call Center Edition - Hint Scammer Simülatörü</p>
+        <button class="menu-btn" onclick="startGame()"><i class="fa-solid fa-play"></i> <span id="btn-start">Oyunu Başlat (Offline)</span></button>
+        <button class="menu-btn secondary" onclick="alert('Multiplayer odaları yakında açılacak kanka!')"><i class="fa-solid fa-users"></i> <span id="btn-multi">Multiplayer (Çok Yakında)</span></button>
     </div>
 
     <!-- OYUN EKRANI -->
     <div id="game-container">
         
-        <!-- Sol Üst: Scam Rehberi / Hedefler -->
+        <!-- Sol Üst: Scam Rehberi -->
         <div id="guide-window" class="window-box">
             <div class="window-header"><span id="guide-title">Scam Rehberi & Hedefler</span><i class="fa-solid fa-minus"></i></div>
             <div class="window-content" id="guide-text">
                 <b>Aktif Senaryo:</b> Tech Support Scam<br>
-                1. Müşteriyi (Cbrody Wave Jenkins) ara/çağrıyı kabul et.<br>
-                2. Bilgisayarında virüs olduğunu söyle.<br>
-                3. Antivirüs veya AnyViewer ile bağlanıp Premium paket sat.<br>
-                4. Kredi kartı bilgilerini iste ve kart uygulamasından çekimi yap!
+                1. Müşteri (Cbrody Wave Jenkins) ile konuş.<br>
+                2. Bilgisayarında trojan olduğunu iddia et.<br>
+                3. AnyViewer ile bağlanıp Premium paket sat ($80).<br>
+                4. Chatten kart numarasını kopyalayıp Credit Card app ile parayı çek!
             </div>
         </div>
 
-        <!-- Sağ Üst: Karakter Facecam -->
+        <!-- Sağ Üst: Facecam -->
         <div id="facecam-window" class="window-box">
-            <div class="window-header"><span>RajeshCam.exe</span><span class="status-badge"><i class="fa-solid fa-circle text-success"></i> LIVE</span></div>
+            <div class="window-header"><span>RajeshCam.exe</span><span class="status-badge"><i class="fa-solid fa-circle"></i> LIVE</span></div>
             <div class="facecam-view">
                 <div class="avatar-anim">👨🏽‍💻</div>
+            </div>
+        </div>
+
+        <!-- Sağ Taraf: Kota ve Kazançlar -->
+        <div id="stats-window">
+            <div class="quota-box">
+                <div class="quota-title" id="q-daily-title">GÜNLÜK KOTA</div>
+                <div class="quota-amount">$<span id="current-balance">0</span> / $500</div>
+            </div>
+            <div class="quota-box">
+                <div class="quota-title" id="q-scenario-title">AKTİF SENARYO</div>
+                <div style="font-size:0.9rem; color:#38bdf8; font-weight:600;" id="active-sc-name">Tech Support</div>
+            </div>
+            <div style="margin-top:auto; font-size:0.75rem; color:#64748b; text-align:center;">
+                Scam With Your Friends v0.2 [Web Sim]
             </div>
         </div>
 
@@ -148,15 +167,15 @@
                 <div class="app-grid">
                     <button class="app-icon" onclick="openApp('credit')"><i class="fa-solid fa-credit-card"></i><span id="app-cc">Credit Card</span></button>
                     <button class="app-icon" onclick="openApp('anyviewer')"><i class="fa-solid fa-desktop"></i><span>AnyViewer</span></button>
-                    <button class="app-icon" onclick="openApp('crypto')"><i class="fa-brands fa-bitcoin"></i><span>Bitcoin</span></button>
-                    <button class="app-icon" onclick="openApp('giftcard')"><i class="fa-solid fa-gift"></i><span>Gift Cards</span></button>
+                    <button class="app-icon" onclick="openApp('crypto')"><i class="fa-brands fa-bitcoin"></i><span id="app-btc">Bitcoin/Crypto</span></button>
+                    <button class="app-icon" onclick="openApp('giftcard')"><i class="fa-solid fa-gift"></i><span id="app-gift">Gift Cards</span></button>
                     <button class="app-icon" onclick="openApp('scamazon')"><i class="fa-solid fa-box"></i><span>Scamazon</span></button>
                     <button class="app-icon" onclick="openApp('notes')"><i class="fa-solid fa-note-sticky"></i><span id="app-notes">Notes</span></button>
                 </div>
             </div>
         </div>
 
-        <!-- Orta Panel: Arama ve Konuşma Ekranı -->
+        <!-- Orta Panel: Telefon / Chat -->
         <div id="phone-panel">
             <div class="call-header">
                 <div style="font-weight: 600;"><i class="fa-solid fa-phone-volume text-success"></i> <span id="caller-name">Cbrody Wave Jenkins</span></div>
@@ -171,306 +190,37 @@
             </div>
 
             <div class="call-controls">
-                <!-- Mikrofon Bas-Konuş Tuşu -->
                 <button class="mic-btn" id="mic-toggle-btn" onmousedown="startListening()" onmouseup="stopListening()" ontouchstart="startListening()" ontouchend="stopListening()" title="Basılı Tut ve Konuş">
                     <i class="fa-solid fa-microphone"></i>
                 </button>
-                <input type="text" id="transcript-input" class="transcript-input-box" placeholder="Mikrofonunuza basılı tutarak konuşun veya buraya yazın..." onkeypress="handleKeyInput(event)">
+                <input type="text" id="transcript-input" class="transcript-input-box" placeholder="Mikrofonunuza basılı tutarak konuşun veya yazın..." onkeypress="handleKeyInput(event)">
                 <button class="hangup-btn" onclick="hangUp()" id="hangup-text">Hang Up</button>
             </div>
         </div>
 
     </div>
 
-    <!-- Kredi Kartı Çekim Modal Uygulaması -->
+    <!-- Kredi Kartı Ödeme Modalı -->
     <div class="modal-overlay" id="cc-modal">
         <div class="modal-window">
-            <div class="modal-head"><span id="cc-modal-title">Credit Card Payment Gateway</span><i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeApp('credit')"></i></div>
+            <div class="modal-head"><span id="cc-modal-title">Credit Card Gateway</span><i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeApp('credit')"></i></div>
             <div class="modal-body">
-                <label id="cc-num-label">Kredi Kartı Numarası (Sohbetten Kopyala):</label>
-                <input type="text" id="input-card-num" placeholder="4152 50... (Chatten kopyalayıp yapıştırın)">
+                <label id="cc-num-label">Kart Numarası (Chatten Kopyala):</label>
+                <input type="text" id="input-card-num" placeholder="Örn: 4152 8832...">
                 <label id="cc-amount-label">Çekilecek Tutar ($):</label>
                 <input type="number" id="input-card-amount" value="80">
-                <button onclick="processPayment()" id="cc-pay-btn">Parayı Çek ($)</button>
+                <button onclick="processPayment()" id="cc-pay-btn">Ödemeyi Al ($)</button>
             </div>
         </div>
     </div>
 
-    <!-- AnyViewer / Antivirüs Modal -->
+    <!-- AnyViewer Modalı -->
     <div class="modal-overlay" id="anyviewer-modal">
         <div class="modal-window">
             <div class="modal-head"><span>AnyViewer Remote Access</span><i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeApp('anyviewer')"></i></div>
             <div class="modal-body" style="text-align:center;">
-                <p id="av-desc" style="font-size:0.9rem; color:#9ca3af;">Müşterinin ekranına bağlanılıyor... Trojen tespit edildi!</p>
-                <div style="background:#000; padding:20px; font-family:'VT323'; color:#ef4444; font-size:1.2rem; border-radius:6px;">
-                    WARNING: TROJAN.Win32.Generic!
+                <p id="av-desc" style="font-size:0.9rem; color:#94a3b8;">Müşterinin ekranına bağlanılıyor...</p>
+                <div style="background:#000; padding:15px; font-family:'VT323'; color:#ef4444; font-size:1.1rem; border-radius:6px;">
+                    CRITICAL: TROJAN.Win32.Generic Detected!
                 </div>
-                <button onclick="installAntivirus()" id="av-install-btn">Antivirüs & Premium Plan Yükle</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        let currentLang = 'tr';
-        let callTrust = 50;
-        let customerEmotion = 'Calm';
-        let copiedTextStore = "";
-
-        const translations = {
-            tr: {
-                title: "SCAM WITH YOUR FRIENDS",
-                subtitle: "Call Center Edition - Hint Scammer Simülatörü",
-                offlineBtn: "Offline (1 Oyuncu)",
-                multiBtn: "Multiplayer (Çok Yakında)",
-                guideTitle: "Scam Rehberi & Hedefler",
-                guideContent: `<b>Aktif Senaryo:</b> Tech Support Scam<br>1. Müşteriyi (Cbrody Wave Jenkins) ara.<br>2. Bilgisayarında virüs olduğunu söyle.<br>3. AnyViewer ile bağlanıp Premium Antivirüs öner.<br>4. Kredi kartı bilgilerini iste, chatten kopyalayıp Credit Card uygulamasıyla parayı çek!`,
-                appsTitle: "Uygulamalar",
-                appCC: "Kredi Kartı",
-                appNotes: "Notlar",
-                trust: "Güven:",
-                emotion: "Durum:",
-                micPlaceholder: "Sol tıklayıp basılı tutarak konuşun veya yazın...",
-                hangup: "Telefonu Kapat",
-                ccTitle: "Kredi Kartı Ödeme Sistemi",
-                ccNumLabel: "Kredi Kartı Numarası (Sohbetten Kopyala):",
-                ccAmountLabel: "Çekilecek Tutar ($):",
-                ccPayBtn: "Ödemeyi Al ($)",
-                avDesc: "Müşterinin bilgisayarına bağlanıldı. Kritik Trojan tespit edildi!",
-                avBtn: "Antivirüs & Premium Lisans Kur ($80)",
-                initialMsg: "Alo? Kim bu? Bilgisayarım bugün biraz garip çalışıyor da."
-            },
-            en: {
-                title: "SCAM WITH YOUR FRIENDS",
-                subtitle: "Call Center Edition - Indian Scammer Simulator",
-                offlineBtn: "Offline (1 Player)",
-                multiBtn: "Multiplayer (Coming Soon)",
-                guideTitle: "Scam Guide & Objectives",
-                guideContent: `<b>Active Scenario:</b> Tech Support Scam<br>1. Call the customer (Cbrody Wave Jenkins).<br>2. Tell them their PC has a virus.<br>3. Connect via AnyViewer and sell Premium Antivirus.<br>4. Ask for credit card, copy from chat and charge via Credit Card app!`,
-                appsTitle: "Applications",
-                appCC: "Credit Card",
-                appNotes: "Notes",
-                trust: "Trust:",
-                emotion: "Status:",
-                micPlaceholder: "Hold left click & speak or type here...",
-                hangup: "Hang Up",
-                ccTitle: "Credit Card Payment Gateway",
-                ccNumLabel: "Credit Card Number (Copy from Chat):",
-                ccAmountLabel: "Amount to Charge ($):",
-                ccPayBtn: "Process Payment ($)",
-                avDesc: "Connected to customer's PC. Critical Trojan detected!",
-                avBtn: "Install Antivirus & Premium ($80)",
-                initialMsg: "Hello? Who is this? My computer is acting a bit weird today."
-            }
-        };
-
-        function changeLanguage(lang) {
-            currentLang = lang;
-            const t = translations[lang];
-            document.getElementById('ui-title').innerText = t.title;
-            document.getElementById('ui-subtitle').innerText = t.subtitle;
-            document.getElementById('btn-offline').innerText = t.offlineBtn;
-            document.getElementById('btn-multi').innerText = t.multiBtn;
-            document.getElementById('guide-title').innerText = t.guideTitle;
-            document.getElementById('guide-text').innerHTML = t.guideContent;
-            document.getElementById('apps-title').innerText = t.appsTitle;
-            document.getElementById('app-cc').innerText = t.appCC;
-            document.getElementById('app-notes').innerText = t.appNotes;
-            document.getElementById('trust-label').innerText = t.trust;
-            document.getElementById('emotion-label').innerText = t.emotion;
-            document.getElementById('transcript-input').placeholder = t.micPlaceholder;
-            document.getElementById('hangup-text').innerText = t.hangup;
-            document.getElementById('cc-modal-title').innerText = t.ccTitle;
-            document.getElementById('cc-num-label').innerText = t.ccNumLabel;
-            document.getElementById('cc-amount-label').innerText = t.ccAmountLabel;
-            document.getElementById('cc-pay-btn').innerText = t.ccPayBtn;
-            document.getElementById('av-desc').innerText = t.avDesc;
-            document.getElementById('av-install-btn').innerText = t.avBtn;
-            document.getElementById('initial-customer-msg').innerText = t.initialMsg;
-        }
-
-        function startGame(mode) {
-            document.getElementById('main-menu').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('main-menu').style.display = 'none';
-                document.getElementById('game-container').style.display = 'block';
-            }, 500);
-        }
-
-        // Web Speech API ile Mikrofon / Ses Tanıma Desteği
-        let recognition = null;
-        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            recognition = new SpeechRecognition();
-            recognition.continuous = false;
-            recognition.interimResults = false;
-
-            recognition.onresult = function(event) {
-                const speechToText = event.results[0][0].transcript;
-                document.getElementById('transcript-input').value = speechToText;
-                sendPlayerMessage(speechToText);
-            };
-        }
-
-        function startListening() {
-            const btn = document.getElementById('mic-toggle-btn');
-            btn.classList.add('active');
-            if (recognition) {
-                recognition.lang = currentLang === 'tr' ? 'tr-TR' : 'en-US';
-                try { recognition.start(); } catch(e) {}
-            } else {
-                // Tarayıcı desteklemiyorsa örnek simüle ses
-                setTimeout(() => {
-                    const sample = currentLang === 'tr' ? "Bilgisayarınızda virüs var efendim." : "Sir, your computer has a virus.";
-                    document.getElementById('transcript-input').value = sample;
-                    sendPlayerMessage(sample);
-                }, 1000);
-            }
-        }
-
-        function stopListening() {
-            const btn = document.getElementById('mic-toggle-btn');
-            btn.classList.remove('active');
-        }
-
-        function handleKeyInput(event) {
-            if (event.key === 'Enter') {
-                const val = document.getElementById('transcript-input').value;
-                if (val.trim() !== '') {
-                    sendPlayerMessage(val);
-                    document.getElementById('transcript-input').value = '';
-                }
-            }
-        }
-
-        // Oyuncu Mesajı Gönderme ve Chatbot Yanıt Mantığı
-        function sendPlayerMessage(text) {
-            const stream = document.getElementById('chat-stream');
-            
-            // Oyuncu Balonu (Kopyalanabilir)
-            const playerMsg = document.createElement('div');
-            playerMsg.className = 'chat-msg player';
-            playerMsg.innerText = text;
-            playerMsg.title = currentLang === 'tr' ? "Kopyalamak için tıklayın" : "Click to copy";
-            playerMsg.onclick = function() {
-                navigator.clipboard.writeText(text);
-                copiedTextStore = text;
-                alert((currentLang === 'tr' ? "Kopyalandı: " : "Copied: ") + text);
-            };
-            stream.appendChild(playerMsg);
-            stream.scrollTop = stream.scrollHeight;
-
-            // Yapay Zeka Müşterinin Yanıt Simülasyonu
-            setTimeout(() => {
-                generateCustomerResponse(text);
-            }, 1200);
-        }
-
-        function generateCustomerResponse(playerText) {
-            const stream = document.getElementById('chat-stream');
-            const custMsg = document.createElement('div');
-            custMsg.className = 'chat-msg customer';
-
-            let reply = "";
-            const lower = playerText.toLowerCase();
-
-            if (lower.includes("virüs") || lower.includes("virus") || lower.includes("trojan")) {
-                callTrust += 15;
-                customerEmotion = currentLang === 'tr' ? "Endişeli" : "Worried";
-                reply = currentLang === 'tr' ? "Aman Tanrım! Ciddi mi? Nasıl düzelteceğiz bunu?" : "Oh my god! Seriously? How can we fix this?";
-            } else if (lower.includes("kart") || lower.includes("kredi") || lower.includes("card") || lower.includes("credit")) {
-                callTrust += 30;
-                customerEmotion = currentLang === 'tr' ? "İkna Oldu" : "Convinced";
-                reply = currentLang === 'tr' ? "Tamamdır, kredi kartı numaram: 4152 8832 9012 3341. Güvendesiniz değil mi?" : "Alright, here is my card number: 4152 8832 9012 3341. You are trusted right?";
-            } else if (lower.includes("yükle") || lower.includes("antivirüs") || lower.includes("install") || lower.includes("premium")) {
-                callTrust += 20;
-                customerEmotion = currentLang === 'tr' ? "Normal" : "Calm";
-                reply = currentLang === 'tr' ? "Normal mi, premium mu olsun? Fiyatı ne kadar?" : "Should I get normal or premium? How much is it?";
-            } else {
-                callTrust -= 5;
-                reply = currentLang === 'tr' ? "Anlayamadım, tam olarak ne yapmam gerekiyor?" : "I didn't quite get that, what do I need to do?";
-            }
-
-            // Değerleri Güncelle
-            if (callTrust > 100) callTrust = 100;
-            if (callTrust < 0) callTrust = 0;
-            document.getElementById('trust-val').innerText = callTrust + '%';
-            document.getElementById('emotion-val').innerText = customerEmotion;
-
-            custMsg.innerText = reply;
-            stream.appendChild(custMsg);
-            stream.scrollTop = stream.scrollHeight;
-        }
-
-        // Uygulama Pencerelerini Açma / Kapatma
-        function openApp(appName) {
-            if (appName === 'credit') document.getElementById('cc-modal').style.display = 'flex';
-            if (appName === 'anyviewer') document.getElementById('anyviewer-modal').style.display = 'flex';
-            if (appName === 'notes') alert(currentLang === 'tr' ? "Notlar: Müşteriden kart numarasını almayı unutma!" : "Notes: Don't forget to get the card number from the customer!");
-            if (appName === 'crypto' || appName === 'giftcard' || appName === 'scamazon') alert(currentLang === 'tr' ? "Bu modül yakında aktifleşecek!" : "This module will be available soon!");
-        }
-
-        function closeApp(appName) {
-            if (appName === 'credit') document.getElementById('cc-modal').style.display = 'none';
-            if (appName === 'anyviewer') document.getElementById('anyviewer-modal').style.display = 'none';
-        }
-
-        function installAntivirus() {
-            alert(currentLang === 'tr' ? "Premium Antivirüs yüklendi! Şimdi müşteriden kart bilgilerini isteyip ödeme al." : "Premium Antivirus installed! Now ask for card details and process payment.");
-            closeApp('anyviewer');
-            callTrust += 25;
-            document.getElementById('trust-val').innerText = callTrust + '%';
-        }
-
-        function processPayment() {
-            const cardNum = document.getElementById('input-card-num').value;
-            const amount = document.getElementById('input-card-amount').value;
-            if (!cardNum) {
-                alert(currentLang === 'tr' ? "Lütfen geçerli bir kart numarası girin!" : "Please enter a valid card number!");
-                return;
-            }
-            alert((currentLang === 'tr' ? "BAŞARILI! Karttan $" : "SUCCESS! Charged $") + amount + (currentLang === 'tr' ? " çekildi! Scam başarılı!" : " from card! Scam successful!"));
-            closeApp('credit');
-            setTimeout(() => {
-                alert(currentLang === 'tr' ? "Müşteri paranın çekildiğini fark etti ve telefonu kapattı!" : "Customer noticed the charge and hung up!");
-                hangUp();
-            }, 2000);
-        }
-
-        function hangUp() {
-            alert(currentLang === 'tr' ? "Çağrı sonlandırıldı. Yeni müşteri aranıyor..." : "Call ended. Calling next customer...");
-            callTrust = 50;
-            document.getElementById('trust-val').innerText = '50%';
-            document.getElementById('chat-stream').innerHTML = `<div class="chat-msg customer">${translations[currentLang].initialMsg}</div>`;
-        }
-
-        // Pencereleri Sürükleme (Drag & Drop) Özelliği
-        document.querySelectorAll('.window-box').forEach(windowBox => {
-            const header = windowBox.querySelector('.window-header');
-            let isDragging = false;
-            let startX, startY, initialX, initialY;
-
-            header.addEventListener('mousedown', (e) => {
-                isDragging = true;
-                startX = e.clientX;
-                startY = e.clientY;
-                initialX = windowBox.offsetLeft;
-                initialY = windowBox.offsetTop;
-                windowBox.classList.add('dragging');
-            });
-
-            window.addEventListener('mousemove', (e) => {
-                if (!isDragging) return;
-                const dx = e.clientX - startX;
-                const dy = e.clientY - startY;
-                windowBox.style.left = `${initialX + dx}px`;
-                windowBox.style.top = `${initialY + dy}px`;
-            });
-
-            window.addEventListener('mouseup', () => {
-                isDragging = false;
-                windowBox.classList.remove('dragging');
-            });
-        });
-    </script>
-</body>
-</html>
+                <button onclick="installAnt
