@@ -8,7 +8,6 @@ st.set_page_config(
     layout="wide"
 )
 
-# Tüm oyun arayüzünü, uygulamaları, ses tanıma ve sesli AI yanıt sistemini içeren HTML kodu
 game_html = """
 <!DOCTYPE html>
 <html lang="en">
@@ -24,7 +23,6 @@ game_html = """
 
         #game-container { display: flex; width: 100vw; height: 100vh; position: relative; background: #090d16; }
         
-        /* Sol Sidebar: Uygulamalar ve Rehber */
         .sidebar { width: 340px; background: #1e293b; border-right: 1px solid #334155; display: flex; flex-direction: column; padding: 15px; gap: 12px; overflow-y: auto; height: 100vh; }
         .panel { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 12px; }
         .panel h3 { font-size: 0.85rem; color: #94a3b8; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
@@ -37,7 +35,6 @@ game_html = """
         .app-icon:hover { background: #475569; transform: scale(1.05); }
         .app-icon i { font-size: 1.2rem; color: #38bdf8; }
 
-        /* Orta Telefon Alanı */
         .main-call-area { flex: 1; display: flex; flex-direction: column; background: #0f172a; height: 100vh; }
         .call-header { background: #1e293b; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
         .call-stats { display: flex; gap: 15px; font-size: 0.85rem; }
@@ -49,7 +46,6 @@ game_html = """
         .chat-msg.player { background: #047857; color: #ecfdf5; align-self: flex-end; cursor: pointer; }
         .chat-msg.player:hover { outline: 2px dashed #34d399; }
         
-        /* Mikrofon Kontrolleri */
         .call-controls { background: #1e293b; padding: 15px 20px; display: flex; gap: 15px; align-items: center; border-top: 1px solid #334155; }
         .mic-btn {
             background: #ef4444; color: #fff; border: none; width: 60px; height: 60px; border-radius: 50%;
@@ -62,7 +58,6 @@ game_html = """
         .hangup-btn { background: #dc2626; color: #fff; border: none; padding: 10px 20px; font-weight: 700; border-radius: 8px; cursor: pointer; }
         .hangup-btn:hover { background: #b91c1c; }
 
-        /* Modaller (Uygulamalar) */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.65); display: none; align-items: center; justify-content: center; z-index: 2000; }
         .modal-window { background: #1e293b; border: 1px solid #475569; border-radius: 10px; width: 400px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
         .modal-head { background: #0f172a; padding: 12px 15px; font-weight: 600; display: flex; justify-content: space-between; border-bottom: 1px solid #334155; }
@@ -75,7 +70,6 @@ game_html = """
 
     <div id="game-container">
         
-        <!-- Sol Panel -->
         <div class="sidebar">
             <h2 style="color:#10b981; font-family:'VT323'; font-size:1.8rem;"><i class="fa-solid fa-headset"></i> SCAM CALL CENTER</h2>
             
@@ -101,229 +95,4 @@ game_html = """
                     <button class="app-icon" onclick="openApp('anyviewer')"><i class="fa-solid fa-desktop"></i><span>AnyViewer</span></button>
                     <button class="app-icon" onclick="openApp('crypto')"><i class="fa-brands fa-bitcoin"></i><span>Crypto</span></button>
                     <button class="app-icon" onclick="openApp('giftcard')"><i class="fa-solid fa-gift"></i><span>Gift Cards</span></button>
-                    <button class="app-icon" onclick="openApp('scamazon')"><i class="fa-solid fa-box"></i><span>Scamazon</span></button>
-                    <button class="app-icon" onclick="openApp('notes')"><i class="fa-solid fa-note-sticky"></i><span>Notes</span></button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Orta Konuşma Alanı -->
-        <div class="main-call-area">
-            <div class="call-header">
-                <div><i class="fa-solid fa-phone-volume" style="color:#10b981;"></i> <b>Cbrody Wave Jenkins</b></div>
-                <div class="call-stats">
-                    <div class="stat-bar"><i class="fa-solid fa-shield-halved"></i> Trust: <b id="trust-val" style="color:#34d399;">50%</b></div>
-                    <div class="stat-bar"><i class="fa-solid fa-face-smile"></i> Status: <b id="emotion-val" style="color:#fbbf24;">Calm</b></div>
-                </div>
-            </div>
-
-            <div class="chat-stream" id="chat-stream">
-                <div class="chat-msg customer" id="initial-msg">Hello? Who is this? My computer is acting a bit weird today.</div>
-            </div>
-
-            <!-- Mikrofon Kontrol Paneli -->
-            <div class="call-controls">
-                <button class="mic-btn" id="mic-btn" onmousedown="startListening()" onmouseup="stopListening()" ontouchstart="startListening()" ontouchend="stopListening()" title="Hold & Speak">
-                    <i class="fa-solid fa-microphone"></i>
-                </button>
-                <div class="transcript-box" id="transcript-display">
-                    <i>Hold the microphone button and speak in English (e.g., "Sir, your computer has a virus")...</i>
-                </div>
-                <button class="hangup-btn" onclick="hangUp()">Hang Up</button>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- Kredi Kartı Modalı -->
-    <div class="modal-overlay" id="cc-modal">
-        <div class="modal-window">
-            <div class="modal-head"><span>Credit Card Gateway</span><i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeApp('credit')"></i></div>
-            <div class="modal-body">
-                <label>Card Number (Copy from chat):</label>
-                <input type="text" id="input-card-num" placeholder="Paste card number here...">
-                <label>Amount ($):</label>
-                <input type="number" id="input-card-amount" value="80">
-                <button onclick="processPayment()">Process Payment ($)</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- AnyViewer Modalı -->
-    <div class="modal-overlay" id="anyviewer-modal">
-        <div class="modal-window">
-            <div class="modal-head"><span>AnyViewer Remote Access</span><i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeApp('anyviewer')"></i></div>
-            <div class="modal-body" style="text-align:center;">
-                <p style="font-size:0.85rem; color:#94a3b8;">Connected to customer PC. Critical Trojan detected!</p>
-                <div style="background:#000; padding:15px; font-family:'VT323'; color:#ef4444; font-size:1.1rem; border-radius:6px;">
-                    CRITICAL: TROJAN.Win32.Generic!
-                </div>
-                <button onclick="installAntivirus()">Install Antivirus & Premium ($80)</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        let trust = 50;
-        let balance = 0;
-        let emotion = "Calm";
-
-        function speakCustomerVoice(text) {
-            if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'en-US';
-                utterance.rate = 1.0;
-                utterance.pitch = 0.9;
-                window.speechSynthesis.speak(utterance);
-            }
-        }
-
-        window.onload = function() {
-            setTimeout(() => {
-                speakCustomerVoice("Hello? Who is this? My computer is acting a bit weird today.");
-            }, 1000);
-        };
-
-        let recognition = null;
-        if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            recognition = new SpeechRecognition();
-            recognition.continuous = false;
-            recognition.interimResults = true;
-            recognition.lang = 'en-US';
-
-            recognition.onresult = function(event) {
-                const text = event.results[0][0].transcript;
-                document.getElementById('transcript-display').innerText = `You: "${text}"`;
-                if (event.results[0].isFinal) {
-                    sendPlayerMessage(text);
-                }
-            };
-            recognition.onerror = () => stopListening();
-            recognition.onend = () => stopListening();
-        }
-
-        function startListening() {
-            window.speechSynthesis.cancel();
-            document.getElementById('mic-btn').classList.add('active');
-            if (recognition) { try { recognition.start(); } catch(e) {} }
-            else {
-                setTimeout(() => {
-                    const sample = "Sir, your computer has a critical virus!";
-                    document.getElementById('transcript-display').innerText = `You: "${sample}"`;
-                    sendPlayerMessage(sample);
-                }, 1000);
-            }
-        }
-
-        function stopListening() {
-            document.getElementById('mic-btn').classList.remove('active');
-            if (recognition) { try { recognition.stop(); } catch(e) {} }
-        }
-
-        function sendPlayerMessage(text) {
-            const stream = document.getElementById('chat-stream');
-            const playerMsg = document.createElement('div');
-            playerMsg.className = 'chat-msg player';
-            playerMsg.innerText = text;
-            playerMsg.title = "Click to copy";
-            playerMsg.onclick = function() {
-                navigator.clipboard.writeText(text);
-                alert("Copied to clipboard: " + text);
-            };
-            stream.appendChild(playerMsg);
-            stream.scrollTop = stream.scrollHeight;
-
-            setTimeout(() => generateAIResponse(text), 1000);
-        }
-
-        function generateAIResponse(playerText) {
-            const stream = document.getElementById('chat-stream');
-            const custMsg = document.createElement('div');
-            custMsg.className = 'chat-msg customer';
-
-            let reply = "";
-            const lower = playerText.toLowerCase();
-
-            if (lower.includes("virus") || lower.includes("trojan") || lower.includes("pc") || lower.includes("computer")) {
-                trust += 20;
-                emotion = "Worried";
-                document.getElementById('emotion-val').innerText = emotion;
-                document.getElementById('emotion-val').style.color = "#ef4444";
-                reply = "Oh my god! Really? How can we fix this right now?";
-            } else if (lower.includes("install") || lower.includes("antivirus") || lower.includes("premium") || lower.includes("price") || lower.includes("dollar")) {
-                trust += 15;
-                emotion = "Curious";
-                document.getElementById('emotion-val').innerText = emotion;
-                document.getElementById('emotion-val').style.color = "#fbbf24";
-                reply = "Should I get normal or premium? How much does it cost?";
-            } else if (lower.includes("card") || lower.includes("credit") || lower.includes("pay") || lower.includes("number")) {
-                trust += 30;
-                emotion = "Convinced";
-                document.getElementById('emotion-val').innerText = emotion;
-                document.getElementById('emotion-val').style.color = "#10b981";
-                reply = "Alright, my card number is 4152 8832 9012 5540. You are trusted, right?";
-            } else {
-                trust -= 5;
-                reply = "I didn't quite catch that. What do I need to do?";
-            }
-
-            if (trust > 100) trust = 100;
-            if (trust < 0) trust = 0;
-            document.getElementById('trust-val').innerText = trust + '%';
-
-            custMsg.innerText = reply;
-            stream.appendChild(custMsg);
-            stream.scrollTop = stream.scrollHeight;
-
-            speakCustomerVoice(reply);
-        }
-
-        function openApp(appName) {
-            if (appName === 'credit') document.getElementById('cc-modal').style.display = 'flex';
-            if (appName === 'anyviewer') document.getElementById('anyviewer-modal').style.display = 'flex';
-            if (appName === 'notes') alert("Notes: Don't forget to get the card number from the customer!");
-            if (appName === 'crypto') alert("Crypto module opened. Pitch meme coins!");
-            if (appName === 'giftcard') alert("Gift card module opened.");
-            if (appName === 'scamazon') alert("Scamazon order portal opened.");
-        }
-
-        function closeApp(appName) {
-            if (appName === 'credit') document.getElementById('cc-modal').style.display = 'none';
-            if (appName === 'anyviewer') document.getElementById('anyviewer-modal').style.display = 'none';
-        }
-
-        function installAntivirus() {
-            alert("Antivirus & Premium installed! Now ask for card details.");
-            closeApp('anyviewer');
-            trust += 15;
-            document.getElementById('trust-val').innerText = trust + '%';
-        }
-
-        function processPayment() {
-            const amount = parseInt(document.getElementById('input-card-amount').value) || 80;
-            balance += amount;
-            document.getElementById('balance').innerText = balance;
-            alert(`SUCCESS! Charged $${amount} from card!`);
-            closeApp('credit');
-            setTimeout(hangUp, 1500);
-        }
-
-        function hangUp() {
-            alert("Call ended. Calling next customer...");
-            trust = 50;
-            emotion = "Calm";
-            document.getElementById('trust-val').innerText = '50%';
-            document.getElementById('emotion-val').innerText = 'Calm';
-            document.getElementById('emotion-val').style.color = "#fbbf24";
-            document.getElementById('chat-stream').innerHTML = `<div class="chat-msg customer" id="initial-msg">Hello? Who is this? My computer is acting a bit weird today.</div>`;
-            speakCustomerVoice("Hello? Who is this? My computer is acting a bit weird today.");
-        }
-    </script>
-</body>
-</html>
-"""
-
-# Streamlit arayüzünde tam ekran (height=900) olarak çalıştırıyoruz
-components.html(game_html, height=900, scrolling=True)
+                    <button class="app-icon" onclick="openApp('scamazon')"><i class="fa-solid fa-box"></i>
