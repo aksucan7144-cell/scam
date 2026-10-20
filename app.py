@@ -1,149 +1,329 @@
 import streamlit as st
+import streamlit.components.v1 as components
 
 # Sayfa Yapılandırması
 st.set_page_config(
-    page_title="Scam With Your Friends - Voice Edition",
+    page_title="Scam With Your Friends - Streamlit Voice Edition",
     page_icon="🎙️",
     layout="wide"
 )
 
-# Oturum Durumu Tanımlamaları
-if "balance" not in st.session_state:
-    st.session_state.balance = 0
-if "trust" not in st.session_state:
-    st.session_state.trust = 50
-
-st.title("🎙️ Scam With Your Friends - Sesli Call Center Modu")
-st.markdown("*(Mikrofonunu tak, basılı tutarak İngilizce konuş, müşteri sana sesli yanıt versin!)*")
-
-# Sidebar - Durum ve Skorlar
-with st.sidebar:
-    st.header("💻 Ofis Paneli")
-    st.metric(label="Günlük Kazanç", value=f"${st.session_state.balance}", delta="$500 Hedef")
-    
-    st.divider()
-    
-    st.subheader("📋 Scam Rehberi")
-    st.info(
-        "1. Aşağıdaki **'Hold to Speak'** butonuna basılı tut.\n"
-        "2. İngilizce konuş (Örn: *'Sir your computer has a virus'*).\n"
-        "3. Müşterinin sesli yanıtını dinle ve kart bilgilerini al!"
-    )
-
-# Tarayıcı İçi Mikrofon ve Sesli AI Müşteri için HTML/JS Bileşeni
-voice_component = """
+# Tüm oyun arayüzünü, uygulamaları, ses tanıma ve sesli AI yanıt sistemini içeren HTML kodu
+game_html = """
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scam With Your Friends</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background-color: #0e1117; color: #fff; font-family: sans-serif; text-align: center; margin: 0; padding: 20px; }
-        .call-box { background: #1f2937; border: 1px solid #374151; border-radius: 12px; padding: 20px; max-width: 600px; margin: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        .mic-btn {
-            background: #ef4444; color: white; border: none; width: 80px; height: 80px; border-radius: 50%;
-            font-size: 2rem; cursor: pointer; box-shadow: 0 0 20px rgba(239,68,68,0.5); transition: 0.2s; margin: 15px 0;
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+        body { background-color: #0b0f19; font-family: 'Inter', sans-serif; color: #fff; overflow: hidden; height: 100vh; }
+
+        #game-container { display: flex; width: 100vw; height: 100vh; position: relative; background: #090d16; }
+        
+        /* Sol Sidebar: Uygulamalar ve Rehber */
+        .sidebar { width: 340px; background: #1e293b; border-right: 1px solid #334155; display: flex; flex-direction: column; padding: 15px; gap: 12px; overflow-y: auto; height: 100vh; }
+        .panel { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 12px; }
+        .panel h3 { font-size: 0.85rem; color: #94a3b8; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        
+        .app-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .app-icon {
+            background: #334155; border: none; border-radius: 6px; padding: 10px 5px; color: #fff;
+            display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer; transition: 0.2s; font-size: 0.7rem;
         }
-        .mic-btn.active { background: #10b981; box-shadow: 0 0 30px rgba(16,185,129,0.8); transform: scale(1.1); }
-        .transcript { background: #111827; padding: 12px; border-radius: 8px; color: #38bdf8; font-family: monospace; font-size: 1.1rem; min-height: 40px; margin-bottom: 15px; }
-        .customer-bubble { background: #374151; padding: 12px; border-radius: 8px; text-align: left; margin-top: 10px; font-size: 1.1rem; }
+        .app-icon:hover { background: #475569; transform: scale(1.05); }
+        .app-icon i { font-size: 1.2rem; color: #38bdf8; }
+
+        /* Orta Telefon Alanı */
+        .main-call-area { flex: 1; display: flex; flex-direction: column; background: #0f172a; height: 100vh; }
+        .call-header { background: #1e293b; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
+        .call-stats { display: flex; gap: 15px; font-size: 0.85rem; }
+        .stat-bar { background: #334155; padding: 4px 10px; border-radius: 4px; display: flex; gap: 6px; align-items: center; }
+        
+        .chat-stream { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; font-family: 'VT323', monospace; font-size: 1.4rem; max-height: calc(100vh - 150px); }
+        .chat-msg { padding: 10px 15px; border-radius: 8px; max-width: 75%; line-height: 1.2; word-break: break-all; }
+        .chat-msg.customer { background: #334155; color: #f8fafc; align-self: flex-start; }
+        .chat-msg.player { background: #047857; color: #ecfdf5; align-self: flex-end; cursor: pointer; }
+        .chat-msg.player:hover { outline: 2px dashed #34d399; }
+        
+        /* Mikrofon Kontrolleri */
+        .call-controls { background: #1e293b; padding: 15px 20px; display: flex; gap: 15px; align-items: center; border-top: 1px solid #334155; }
+        .mic-btn {
+            background: #ef4444; color: #fff; border: none; width: 60px; height: 60px; border-radius: 50%;
+            font-size: 1.3rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 15px rgba(239,68,68,0.5); transition: 0.2s;
+        }
+        .mic-btn.active { background: #10b981; box-shadow: 0 0 25px rgba(16,185,129,0.8); animation: pulseMic 1s infinite; }
+        @keyframes pulseMic { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        
+        .transcript-box { flex: 1; background: #0f172a; border: 1px solid #475569; border-radius: 8px; padding: 10px 15px; font-size: 1rem; color: #38bdf8; font-family: 'VT323', monospace; }
+        .hangup-btn { background: #dc2626; color: #fff; border: none; padding: 10px 20px; font-weight: 700; border-radius: 8px; cursor: pointer; }
+        .hangup-btn:hover { background: #b91c1c; }
+
+        /* Modaller (Uygulamalar) */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.65); display: none; align-items: center; justify-content: center; z-index: 2000; }
+        .modal-window { background: #1e293b; border: 1px solid #475569; border-radius: 10px; width: 400px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
+        .modal-head { background: #0f172a; padding: 12px 15px; font-weight: 600; display: flex; justify-content: space-between; border-bottom: 1px solid #334155; }
+        .modal-body { padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .modal-body input { background: #0f172a; border: 1px solid #334155; padding: 10px; color: #fff; border-radius: 6px; outline: none; }
+        .modal-body button { background: #10b981; border: none; padding: 10px; font-weight: 700; border-radius: 6px; cursor: pointer; color: #0b0f19; }
     </style>
 </head>
 <body>
-    <div class="call-box">
-        <h3>🎧 Active Call: Cbrody Wave Jenkins</h3>
-        <p style="font-size: 0.9rem; color: #9ca3af;">Hold the button & speak in English</p>
-        
-        <div class="transcript" id="transcript">Your speech will appear here...</div>
-        
-        <button class="mic-btn" id="micBtn" onmousedown="startListening()" onmouseup="stopListening()" ontouchstart="startListening()" ontouchend="stopListening()">
-            🎤
-        </button>
-        <p id="status" style="font-size: 0.85rem; color: #fbbf24;">Mic Ready (Hold to Talk)</p>
 
-        <div class="customer-bubble" id="customerReply">
-            <b>Customer:</b> Hello? Who is this? My computer is acting a bit weird today.
+    <div id="game-container">
+        
+        <!-- Sol Panel -->
+        <div class="sidebar">
+            <h2 style="color:#10b981; font-family:'VT323'; font-size:1.8rem;"><i class="fa-solid fa-headset"></i> SCAM CALL CENTER</h2>
+            
+            <div class="panel">
+                <h3>💰 DAILY BALANCE</h3>
+                <div style="font-family:'VT323'; font-size:2rem; color:#34d399;">$<span id="balance">0</span> / $500</div>
+            </div>
+
+            <div class="panel">
+                <h3>📋 SCAM OBJECTIVES</h3>
+                <p style="font-size:0.8rem; color:#cbd5e1; line-height:1.4;">
+                    1. Hold <b>Mic button</b> & speak English.<br>
+                    2. Claim PC has virus/trojan.<br>
+                    3. Sell Antivirus ($80) via AnyViewer.<br>
+                    4. Copy card from chat, charge via Credit Card app!
+                </p>
+            </div>
+
+            <div class="panel">
+                <h3>🛠️ APPLICATIONS</h3>
+                <div class="app-grid">
+                    <button class="app-icon" onclick="openApp('credit')"><i class="fa-solid fa-credit-card"></i><span>Credit Card</span></button>
+                    <button class="app-icon" onclick="openApp('anyviewer')"><i class="fa-solid fa-desktop"></i><span>AnyViewer</span></button>
+                    <button class="app-icon" onclick="openApp('crypto')"><i class="fa-brands fa-bitcoin"></i><span>Crypto</span></button>
+                    <button class="app-icon" onclick="openApp('giftcard')"><i class="fa-solid fa-gift"></i><span>Gift Cards</span></button>
+                    <button class="app-icon" onclick="openApp('scamazon')"><i class="fa-solid fa-box"></i><span>Scamazon</span></button>
+                    <button class="app-icon" onclick="openApp('notes')"><i class="fa-solid fa-note-sticky"></i><span>Notes</span></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Orta Konuşma Alanı -->
+        <div class="main-call-area">
+            <div class="call-header">
+                <div><i class="fa-solid fa-phone-volume" style="color:#10b981;"></i> <b>Cbrody Wave Jenkins</b></div>
+                <div class="call-stats">
+                    <div class="stat-bar"><i class="fa-solid fa-shield-halved"></i> Trust: <b id="trust-val" style="color:#34d399;">50%</b></div>
+                    <div class="stat-bar"><i class="fa-solid fa-face-smile"></i> Status: <b id="emotion-val" style="color:#fbbf24;">Calm</b></div>
+                </div>
+            </div>
+
+            <div class="chat-stream" id="chat-stream">
+                <div class="chat-msg customer" id="initial-msg">Hello? Who is this? My computer is acting a bit weird today.</div>
+            </div>
+
+            <!-- Mikrofon Kontrol Paneli -->
+            <div class="call-controls">
+                <button class="mic-btn" id="mic-btn" onmousedown="startListening()" onmouseup="stopListening()" ontouchstart="startListening()" ontouchend="stopListening()" title="Hold & Speak">
+                    <i class="fa-solid fa-microphone"></i>
+                </button>
+                <div class="transcript-box" id="transcript-display">
+                    <i>Hold the microphone button and speak in English (e.g., "Sir, your computer has a virus")...</i>
+                </div>
+                <button class="hangup-btn" onclick="hangUp()">Hang Up</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Kredi Kartı Modalı -->
+    <div class="modal-overlay" id="cc-modal">
+        <div class="modal-window">
+            <div class="modal-head"><span>Credit Card Gateway</span><i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeApp('credit')"></i></div>
+            <div class="modal-body">
+                <label>Card Number (Copy from chat):</label>
+                <input type="text" id="input-card-num" placeholder="Paste card number here...">
+                <label>Amount ($):</label>
+                <input type="number" id="input-card-amount" value="80">
+                <button onclick="processPayment()">Process Payment ($)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AnyViewer Modalı -->
+    <div class="modal-overlay" id="anyviewer-modal">
+        <div class="modal-window">
+            <div class="modal-head"><span>AnyViewer Remote Access</span><i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="closeApp('anyviewer')"></i></div>
+            <div class="modal-body" style="text-align:center;">
+                <p style="font-size:0.85rem; color:#94a3b8;">Connected to customer PC. Critical Trojan detected!</p>
+                <div style="background:#000; padding:15px; font-family:'VT323'; color:#ef4444; font-size:1.1rem; border-radius:6px;">
+                    CRITICAL: TROJAN.Win32.Generic!
+                </div>
+                <button onclick="installAntivirus()">Install Antivirus & Premium ($80)</button>
+            </div>
         </div>
     </div>
 
     <script>
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        let recognition = null;
-        let isSpeaking = false;
+        let trust = 50;
+        let balance = 0;
+        let emotion = "Calm";
 
-        if (SpeechRecognition) {
+        function speakCustomerVoice(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = 1.0;
+                utterance.pitch = 0.9;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        window.onload = function() {
+            setTimeout(() => {
+                speakCustomerVoice("Hello? Who is this? My computer is acting a bit weird today.");
+            }, 1000);
+        };
+
+        let recognition = null;
+        if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             recognition = new SpeechRecognition();
             recognition.continuous = false;
             recognition.interimResults = true;
             recognition.lang = 'en-US';
 
             recognition.onresult = function(event) {
-                let text = event.results[0][0].transcript;
-                document.getElementById('transcript').innerText = "You: " + text;
+                const text = event.results[0][0].transcript;
+                document.getElementById('transcript-display').innerText = `You: "${text}"`;
                 if (event.results[0].isFinal) {
-                    processAIResponse(text);
+                    sendPlayerMessage(text);
                 }
             };
-
-            recognition.onerror = function() { stopListening(); };
-            recognition.onend = function() { stopListening(); };
-        } else {
-            document.getElementById('transcript').innerText = "Speech recognition not supported in this browser. Use Chrome!";
+            recognition.onerror = () => stopListening();
+            recognition.onend = () => stopListening();
         }
 
         function startListening() {
-            window.speechSynthesis.cancel(); // Müşteri konuşuyorsa sustur
-            document.getElementById('micBtn').classList.add('active');
-            document.getElementById('status').innerText = "Listening...";
-            if (recognition) {
-                try { recognition.start(); } catch(e) {}
+            window.speechSynthesis.cancel();
+            document.getElementById('mic-btn').classList.add('active');
+            if (recognition) { try { recognition.start(); } catch(e) {} }
+            else {
+                setTimeout(() => {
+                    const sample = "Sir, your computer has a critical virus!";
+                    document.getElementById('transcript-display').innerText = `You: "${sample}"`;
+                    sendPlayerMessage(sample);
+                }, 1000);
             }
         }
 
         function stopListening() {
-            document.getElementById('micBtn').classList.remove('active');
-            document.getElementById('status').innerText = "Mic Ready (Hold to Talk)";
-            if (recognition) {
-                try { recognition.stop(); } catch(e) {}
-            }
+            document.getElementById('mic-btn').classList.remove('active');
+            if (recognition) { try { recognition.stop(); } catch(e) {} }
         }
 
-        function speakText(text) {
-            if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'en-US';
-                utterance.rate = 1.0;
-                window.speechSynthesis.speak(utterance);
-            }
+        function sendPlayerMessage(text) {
+            const stream = document.getElementById('chat-stream');
+            const playerMsg = document.createElement('div');
+            playerMsg.className = 'chat-msg player';
+            playerMsg.innerText = text;
+            playerMsg.title = "Click to copy";
+            playerMsg.onclick = function() {
+                navigator.clipboard.writeText(text);
+                alert("Copied to clipboard: " + text);
+            };
+            stream.appendChild(playerMsg);
+            stream.scrollTop = stream.scrollHeight;
+
+            setTimeout(() => generateAIResponse(text), 1000);
         }
 
-        function processAIResponse(playerText) {
+        function generateAIResponse(playerText) {
+            const stream = document.getElementById('chat-stream');
+            const custMsg = document.createElement('div');
+            custMsg.className = 'chat-msg customer';
+
             let reply = "";
-            let lower = playerText.toLowerCase();
+            const lower = playerText.toLowerCase();
 
-            if (lower.includes("virus") || lower.includes("trojan") || lower.includes("pc")) {
+            if (lower.includes("virus") || lower.includes("trojan") || lower.includes("pc") || lower.includes("computer")) {
+                trust += 20;
+                emotion = "Worried";
+                document.getElementById('emotion-val').innerText = emotion;
+                document.getElementById('emotion-val').style.color = "#ef4444";
                 reply = "Oh my god! Really? How can we fix this right now?";
+            } else if (lower.includes("install") || lower.includes("antivirus") || lower.includes("premium") || lower.includes("price") || lower.includes("dollar")) {
+                trust += 15;
+                emotion = "Curious";
+                document.getElementById('emotion-val').innerText = emotion;
+                document.getElementById('emotion-val').style.color = "#fbbf24";
+                reply = "Should I get normal or premium? How much does it cost?";
             } else if (lower.includes("card") || lower.includes("credit") || lower.includes("pay") || lower.includes("number")) {
+                trust += 30;
+                emotion = "Convinced";
+                document.getElementById('emotion-val').innerText = emotion;
+                document.getElementById('emotion-val').style.color = "#10b981";
                 reply = "Alright, my card number is 4152 8832 9012 5540. You are trusted, right?";
-            } else if (lower.includes("hello") || lower.includes("hi")) {
-                reply = "Hello! Who is this calling?";
             } else {
-                reply = "I didn't quite catch that. What should I do?";
+                trust -= 5;
+                reply = "I didn't quite catch that. What do I need to do?";
             }
 
-            document.getElementById('customerReply').innerHTML = "<b>Customer:</b> " + reply;
-            speakText(reply);
+            if (trust > 100) trust = 100;
+            if (trust < 0) trust = 0;
+            document.getElementById('trust-val').innerText = trust + '%';
+
+            custMsg.innerText = reply;
+            stream.appendChild(custMsg);
+            stream.scrollTop = stream.scrollHeight;
+
+            speakCustomerVoice(reply);
         }
 
-        // Sayfa açıldığında ilk karşılama sesini çal
-        window.onload = function() {
-            setTimeout(() => {
-                speakText("Hello? Who is this? My computer is acting a bit weird today.");
-            }, 1000);
-        };
+        function openApp(appName) {
+            if (appName === 'credit') document.getElementById('cc-modal').style.display = 'flex';
+            if (appName === 'anyviewer') document.getElementById('anyviewer-modal').style.display = 'flex';
+            if (appName === 'notes') alert("Notes: Don't forget to get the card number from the customer!");
+            if (appName === 'crypto') alert("Crypto module opened. Pitch meme coins!");
+            if (appName === 'giftcard') alert("Gift card module opened.");
+            if (appName === 'scamazon') alert("Scamazon order portal opened.");
+        }
+
+        function closeApp(appName) {
+            if (appName === 'credit') document.getElementById('cc-modal').style.display = 'none';
+            if (appName === 'anyviewer') document.getElementById('anyviewer-modal').style.display = 'none';
+        }
+
+        function installAntivirus() {
+            alert("Antivirus & Premium installed! Now ask for card details.");
+            closeApp('anyviewer');
+            trust += 15;
+            document.getElementById('trust-val').innerText = trust + '%';
+        }
+
+        function processPayment() {
+            const amount = parseInt(document.getElementById('input-card-amount').value) || 80;
+            balance += amount;
+            document.getElementById('balance').innerText = balance;
+            alert(`SUCCESS! Charged $${amount} from card!`);
+            closeApp('credit');
+            setTimeout(hangUp, 1500);
+        }
+
+        function hangUp() {
+            alert("Call ended. Calling next customer...");
+            trust = 50;
+            emotion = "Calm";
+            document.getElementById('trust-val').innerText = '50%';
+            document.getElementById('emotion-val').innerText = 'Calm';
+            document.getElementById('emotion-val').style.color = "#fbbf24";
+            document.getElementById('chat-stream').innerHTML = `<div class="chat-msg customer" id="initial-msg">Hello? Who is this? My computer is acting a bit weird today.</div>`;
+            speakCustomerVoice("Hello? Who is this? My computer is acting a bit weird today.");
+        }
     </script>
 </body>
 </html>
 """
 
-# Streamlit içine bu bileşeni gömüyoruz
-import streamlit.components.v1 as components
-components.html(voice_component, height=420)
+# Streamlit arayüzünde tam ekran (height=900) olarak çalıştırıyoruz
+components.html(game_html, height=900, scrolling=True)
