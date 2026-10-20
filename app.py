@@ -1,136 +1,149 @@
 import streamlit as st
-import random
-import time
 
 # Sayfa Yapılandırması
 st.set_page_config(
-    page_title="Scam With Your Friends - Streamlit Edition",
-    page_icon="👨🏽‍💻",
+    page_title="Scam With Your Friends - Voice Edition",
+    page_icon="🎙️",
     layout="wide"
 )
 
-# Oturum Durumu (State) Tanımlamaları
-if "initialized" not in st.session_state:
+# Oturum Durumu Tanımlamaları
+if "balance" not in st.session_state:
     st.session_state.balance = 0
+if "trust" not in st.session_state:
     st.session_state.trust = 50
-    st.session_state.emotion = "Calm / Sakin"
-    st.session_state.messages = [
-        {"role": "customer", "content": "Alo? Kim bu? Bilgisayarım bugün biraz garip çalışıyor da."}
-    ]
-    st.session_state.scenario = "Tech Support Scam"
-    st.session_state.initialized = True
 
-# Stil ve Arayüz Düzenlemeleri
-st.title("📞 Scam With Your Friends - Call Center Simülatörü")
-st.markdown("*(Hint Scammer Modu Aktif 🇮🇳)*")
+st.title("🎙️ Scam With Your Friends - Sesli Call Center Modu")
+st.markdown("*(Mikrofonunu tak, basılı tutarak İngilizce konuş, müşteri sana sesli yanıt versin!)*")
 
-# Sidebar (Yan Menü - Uygulamalar ve Hedefler)
+# Sidebar - Durum ve Skorlar
 with st.sidebar:
-    st.header("💻 Ofis Bilgisayarı")
-    
-    # Günlük Kota
-    st.metric(label="Günlük Kazanç / Kota", value=f"${st.session_state.balance}", delta="$500 Hedef")
+    st.header("💻 Ofis Paneli")
+    st.metric(label="Günlük Kazanç", value=f"${st.session_state.balance}", delta="$500 Hedef")
     
     st.divider()
     
     st.subheader("📋 Scam Rehberi")
     st.info(
-        "**Aktif Senaryo:** Tech Support\n\n"
-        "1. Müşteriye virüs olduğunu söyle.\n"
-        "2. AnyViewer ile bağlanıp Premium sat ($80).\n"
-        "3. Kart numarasını alıp karttan çekimi yap!"
+        "1. Aşağıdaki **'Hold to Speak'** butonuna basılı tut.\n"
+        "2. İngilizce konuş (Örn: *'Sir your computer has a virus'*).\n"
+        "3. Müşterinin sesli yanıtını dinle ve kart bilgilerini al!"
     )
-    
-    st.divider()
-    
-    st.subheader("🛠️ Uygulamalar & Araçlar")
-    app_choice = st.selectbox("Bir uygulama aç:", ["Seçiniz...", "Credit Card Gateway", "AnyViewer (Remote)", "Crypto / Bitcoin"])
-    
-    if app_choice == "Credit Card Gateway":
-        st.warning("💳 Kredi Kartı Ödeme Paneli")
-        card_num = st.text_input("Kart Numarası (Chatten kopyala):", placeholder="4152 88...")
-        amount = st.number_input("Çekilecek Tutar ($)", value=80)
-        if st.button("Parayı Çek ($)"):
-            if card_num:
-                st.session_state.balance += amount
-                st.success(f"BAŞARILI! Karttan ${amount} çekildi!")
-                st.balloons()
-            else:
-                st.error("Lütfen kart numarası girin!")
-                
-    elif app_choice == "AnyViewer (Remote)":
-        st.warning("🖥️ Uzaktan Bağlantı")
-        st.code("CRITICAL: Trojan.Win32 Detected!")
-        if st.button("Antivirüs Lisansı Sat ($80)"):
-            st.session_state.trust += 25
-            st.success("Premium lisans yüklendi! Güven arttı.")
-            
-    elif app_choice == "Crypto / Bitcoin":
-        st.warning("📈 Meme Coin Borsası")
-        crypto_price = random.randint(90, 250)
-        st.metric("Coin Değeri", f"${crypto_price}")
-        if st.button("Coini Bozdur (Cash Out)"):
-            st.session_state.balance += crypto_price
-            st.success(f"${crypto_price} cüzdana eklendi!")
 
-# Ana Ekran (Telefon Görüşmesi ve Chat Akışı)
-col1, col2 = st.columns([3, 1])
-
-with col1:
-    st.subheader("🎧 Aktif Çağrı: Cbrody Wave Jenkins")
-    
-    # Sohbet Geçmişini Gösterme Alanı
-    chat_container = st.container(height=400)
-    with chat_container:
-        for msg in st.session_state.messages:
-            if msg["role"] == "customer":
-                st.markdown(f"🧑‍💼 **Müşteri:** {msg['content']}")
-            else:
-                st.markdown(f"👨🏽‍💻 **Sen (Scammer):** `{msg['content']}`")
-
-    # Kullanıcının Metin Girişi
-    user_input = st.chat_input("Müşteriye ne söyleyeceksin? (Örn: Bilgisayarınızda virüs var...)")
-
-    if user_input:
-        # Oyuncu mesajını ekle
-        st.session_state.messages.append({"role": "player", "content": user_input})
+# Tarayıcı İçi Mikrofon ve Sesli AI Müşteri için HTML/JS Bileşeni
+voice_component = """
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { background-color: #0e1117; color: #fff; font-family: sans-serif; text-align: center; margin: 0; padding: 20px; }
+        .call-box { background: #1f2937; border: 1px solid #374151; border-radius: 12px; padding: 20px; max-width: 600px; margin: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .mic-btn {
+            background: #ef4444; color: white; border: none; width: 80px; height: 80px; border-radius: 50%;
+            font-size: 2rem; cursor: pointer; box-shadow: 0 0 20px rgba(239,68,68,0.5); transition: 0.2s; margin: 15px 0;
+        }
+        .mic-btn.active { background: #10b981; box-shadow: 0 0 30px rgba(16,185,129,0.8); transform: scale(1.1); }
+        .transcript { background: #111827; padding: 12px; border-radius: 8px; color: #38bdf8; font-family: monospace; font-size: 1.1rem; min-height: 40px; margin-bottom: 15px; }
+        .customer-bubble { background: #374151; padding: 12px; border-radius: 8px; text-align: left; margin-top: 10px; font-size: 1.1rem; }
+    </style>
+</head>
+<body>
+    <div class="call-box">
+        <h3>🎧 Active Call: Cbrody Wave Jenkins</h3>
+        <p style="font-size: 0.9rem; color: #9ca3af;">Hold the button & speak in English</p>
         
-        # Yapay Zeka Müşterinin Yanıt Mantığı
-        lower_text = user_input.lower()
-        customer_reply = ""
+        <div class="transcript" id="transcript">Your speech will appear here...</div>
         
-        if "virüs" in lower_text or "virus" in lower_text or "trojan" in lower_text:
-            st.session_state.trust += 15
-            st.session_state.emotion = "Worried / Endişeli"
-            customer_reply = "Aman Tanrım! Ciddi mi? Nasıl düzelteceğiz bunu?"
-        elif "kart" in lower_text or "kredi" in lower_text or "card" in lower_text:
-            st.session_state.trust += 30
-            st.session_state.emotion = "Convinced / İkna Oldu"
-            customer_reply = "Tamamdır, kredi kartı numaram: `4152 9012 3341 5520`. Güvendesiniz değil mi?"
-        else:
-            st.session_state.trust -= 5
-            customer_reply = "Anlayamadım, tam olarak ne yapmam gerekiyor efendim?"
-            
-        # Güven sınırları
-        st.session_state.trust = max(0, min(100, st.session_state.trust))
-        
-        # Müşteri yanıtını ekle
-        st.session_state.messages.append({"role": "customer", "content": customer_reply})
-        st.rerun()
+        <button class="mic-btn" id="micBtn" onmousedown="startListening()" onmouseup="stopListening()" ontouchstart="startListening()" ontouchend="stopListening()">
+            🎤
+        </button>
+        <p id="status" style="font-size: 0.85rem; color: #fbbf24;">Mic Ready (Hold to Talk)</p>
 
-with col2:
-    st.subheader("📊 İstatistikler")
-    st.metric(label="Müşteri Güveni", value=f"{st.session_state.trust}%")
-    st.metric(label="Müşteri Durumu", value=st.session_state.emotion)
-    
-    st.divider()
-    
-    if st.button("📴 Telefonu Kapat (Hang Up)", use_container_width=True):
-        st.session_state.trust = 50
-        st.session_state.emotion = "Calm / Sakin"
-        st.session_state.messages = [
-            {"role": "customer", "content": "Alo? Kim bu? Bilgisayarım bugün biraz garip çalışıyor da."}
-        ]
-        st.success("Çağrı sonlandırıldı. Yeni müşteri aranıyor...")
-        time.sleep(1)
-        st.rerun()
+        <div class="customer-bubble" id="customerReply">
+            <b>Customer:</b> Hello? Who is this? My computer is acting a bit weird today.
+        </div>
+    </div>
+
+    <script>
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition = null;
+        let isSpeaking = false;
+
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+
+            recognition.onresult = function(event) {
+                let text = event.results[0][0].transcript;
+                document.getElementById('transcript').innerText = "You: " + text;
+                if (event.results[0].isFinal) {
+                    processAIResponse(text);
+                }
+            };
+
+            recognition.onerror = function() { stopListening(); };
+            recognition.onend = function() { stopListening(); };
+        } else {
+            document.getElementById('transcript').innerText = "Speech recognition not supported in this browser. Use Chrome!";
+        }
+
+        function startListening() {
+            window.speechSynthesis.cancel(); // Müşteri konuşuyorsa sustur
+            document.getElementById('micBtn').classList.add('active');
+            document.getElementById('status').innerText = "Listening...";
+            if (recognition) {
+                try { recognition.start(); } catch(e) {}
+            }
+        }
+
+        function stopListening() {
+            document.getElementById('micBtn').classList.remove('active');
+            document.getElementById('status').innerText = "Mic Ready (Hold to Talk)";
+            if (recognition) {
+                try { recognition.stop(); } catch(e) {}
+            }
+        }
+
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = 1.0;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function processAIResponse(playerText) {
+            let reply = "";
+            let lower = playerText.toLowerCase();
+
+            if (lower.includes("virus") || lower.includes("trojan") || lower.includes("pc")) {
+                reply = "Oh my god! Really? How can we fix this right now?";
+            } else if (lower.includes("card") || lower.includes("credit") || lower.includes("pay") || lower.includes("number")) {
+                reply = "Alright, my card number is 4152 8832 9012 5540. You are trusted, right?";
+            } else if (lower.includes("hello") || lower.includes("hi")) {
+                reply = "Hello! Who is this calling?";
+            } else {
+                reply = "I didn't quite catch that. What should I do?";
+            }
+
+            document.getElementById('customerReply').innerHTML = "<b>Customer:</b> " + reply;
+            speakText(reply);
+        }
+
+        // Sayfa açıldığında ilk karşılama sesini çal
+        window.onload = function() {
+            setTimeout(() => {
+                speakText("Hello? Who is this? My computer is acting a bit weird today.");
+            }, 1000);
+        };
+    </script>
+</body>
+</html>
+"""
+
+# Streamlit içine bu bileşeni gömüyoruz
+import streamlit.components.v1 as components
+components.html(voice_component, height=420)
