@@ -8,7 +8,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# Tam ve Eksiksiz Oyun Kodları
+# Akıllı AI Müşteri Mantığı Eklenmiş Tam Sürüm
 game_html = r"""
 <!DOCTYPE html>
 <html lang="en">
@@ -227,41 +227,48 @@ game_html = r"""
             setTimeout(() => generateAIResponse(text), 1000);
         }
 
+        // ÇOK DAHA DOĞAL VE DİNAMİK MÜŞTERİ YANIT ÜRETİCİSİ
         function generateAIResponse(playerText) {
             const stream = document.getElementById('chat-stream');
             const custMsg = document.createElement('div');
             custMsg.className = 'chat-msg customer';
 
             let reply = "";
-            const lower = playerText.toLowerCase();
+            const t = playerText.toLowerCase();
 
-            if (lower.includes("virus") || lower.includes("trojan") || lower.includes("pc") || lower.includes("computer") || lower.includes("department")) {
+            // Esnek kelime kökü analizi ile müşterinin gerçekçi tepki vermesi sağlanıyor
+            if (t.includes("virus") || t.includes("trojan") || t.includes("pc") || t.includes("computer") || t.includes("department") || t.includes("united states")) {
                 trust += 15;
                 emotion = "Worried";
                 document.getElementById('emotion-val').innerText = emotion;
                 document.getElementById('emotion-val').style.color = "#ef4444";
-                reply = "Oh my god! Really? Is my data safe? What should I do right now?";
-            } else if (lower.includes("antivirus") || lower.includes("install") || lower.includes("pattern") || lower.includes("store")) {
+                reply = "Wait, a virus? On my computer? Is my personal data and photos safe right now, sir?";
+            } else if (t.includes("antivirus") || t.includes("pattern") || t.includes("store") || t.includes("normal") || t.includes("premium")) {
                 trust += 20;
                 emotion = "Curious";
                 document.getElementById('emotion-val').innerText = emotion;
                 document.getElementById('emotion-val').style.color = "#fbbf24";
-                reply = "Okay, should I get the normal plan or the premium plan? What's the price?";
-            } else if (lower.includes("discount") || lower.includes("premium") || lower.includes("dollar") || lower.includes("$") || lower.includes("off")) {
+                reply = "Oh I see. What is the difference between the normal and premium antivirus plans?";
+            } else if (t.includes("discount") || t.includes("dollar") || t.includes("$") || t.includes("100") || t.includes("18") || t.includes("off")) {
                 trust += 25;
                 emotion = "Interested";
                 document.getElementById('emotion-val').innerText = emotion;
                 document.getElementById('emotion-val').style.color = "#38bdf8";
-                reply = "That sounds like a good deal! How do I pay you? Should I give you my credit card details?";
-            } else if (lower.includes("card") || lower.includes("credit") || lower.includes("pay") || lower.includes("number")) {
+                reply = "That discount sounds really great! How should I pay for this premium plan?";
+            } else if (t.includes("card") || t.includes("credit") || t.includes("pay") || t.includes("number") || t.includes("digits")) {
                 trust += 35;
                 emotion = "Convinced";
                 document.getElementById('emotion-val').innerText = emotion;
                 document.getElementById('emotion-val').style.color = "#10b981";
-                reply = "Alright, here is my credit card number: 4152 8832 9012 5540. Please don't charge too much!";
+                reply = "Alright, here is my card number: 4152 8832 9012 5540. Please process it safely!";
+            } else if (t.includes("hello") || t.includes("hi") || t.includes("nate")) {
+                reply = "Hello there! Why are you calling me today?";
             } else {
-                trust -= 5;
-                reply = "I didn't quite catch that. Could you repeat it slowly?";
+                trust -= 2;
+                emotion = "Confused";
+                document.getElementById('emotion-val').innerText = emotion;
+                document.getElementById('emotion-val').style.color = "#94a3b8";
+                reply = "Hmm, I didn't quite understand that part. Could you explain it simpler?";
             }
 
             if (trust > 100) trust = 100;
@@ -311,7 +318,7 @@ game_html = r"""
             emotion = "Calm";
             document.getElementById('trust-val').innerText = '50%';
             document.getElementById('emotion-val').innerText = 'Calm';
-            document.getElementById('emotion-val').style.color = "#fbbf24";
+            document.getElementById('emotion-val'].style.color = "#fbbf24";
             document.getElementById('chat-stream').innerHTML = `<div class="chat-msg customer" id="initial-msg">Hello? Who is this? My computer is acting a bit weird today.</div>`;
             speakCustomerVoice("Hello? Who is this? My computer is acting a bit weird today.");
         }
@@ -320,5 +327,4 @@ game_html = r"""
 </html>
 """
 
-# Streamlit arayüzünde tam ekran olarak yüklüyoruz
 components.html(game_html, height=900, scrolling=True)
